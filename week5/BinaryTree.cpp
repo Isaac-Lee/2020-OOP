@@ -7,8 +7,8 @@ class Node {
   Node(const Node& node) : value_(node.value_),
   left_(node.left_), right_(node.right_) {}
   ~Node() {
-    delete right_;
     delete left_;
+    delete right_;
     delete this;
   }
   int value() {
@@ -52,12 +52,16 @@ class TreeUtil {
     return s_tree_util_;
   }
   int CalHeight(const Node* node) {
-    int left_count, right_count;
+    int left_count = 0, right_count = 0;
     const Node* left_node = node->left();
     const Node* right_node = node->right();
+    // If right or left node exist serch the height of left and right sub tree.
+    // If left sub tree height is more bigger return it.
+    // If right sub tree height is more bigger return it.
+    // If right and left node don't exixt, retun 0.
     if ((left_node != NULL) || (right_node != NULL)) {
-      left_count = CalHeight(left_node);
-      right_count = CalHeight(right_node);
+      left_count = CalHeight(left_node) + 1;
+      right_count = CalHeight(right_node) + 1;
       if (left_count >= right_count) {
         return left_count;
       } else {
@@ -68,9 +72,11 @@ class TreeUtil {
     }
   }
   int CalTotalNumOfNodes(const Node* node) {
-     int count;
+    int count = 0;
     const Node* left_node = node->left();
     const Node* right_node = node->right();
+    // Count all subtree's node.
+    // If right or left node don't exist, return 1.
     if (left_node != NULL) {
       count = CalTotalNumOfNodes(left_node);
     }
@@ -83,6 +89,23 @@ class TreeUtil {
     std::vector<const Node*> leaf_nodes;
     const Node* left_node = node->left();
     const Node* right_node = node->right();
+    // If right or left node don't exist, it is leaf node, so return it.
+    if ((left_node == NULL) && (right_node == NULL)) {
+      leaf_nodes.push_back(node);
+      return leaf_nodes;
+    }
+    // if left or right node exist, insert the nodes and return it.
+    if (left_node != NULL) {
+      std::vector<const Node*> left_leaf_nodes = GetLeaves(left_node);
+      leaf_nodes.insert(leaf_nodes.end(), left_leaf_nodes.begin(),
+      left_leaf_nodes.end());
+    }
+    if (right_node != NULL)  {
+      std::vector<const Node*> right_leaf_nodes = GetLeaves(right_node);
+      leaf_nodes.insert(leaf_nodes.end(), right_leaf_nodes.begin(),
+      right_leaf_nodes.end());
+    }
+    return leaf_nodes;
   }
   bool IsFullBinaryTree(const Node* node) {
     const Node* left_node = node->left();
@@ -90,7 +113,14 @@ class TreeUtil {
     if ((left_node != NULL) && (right_node != NULL)) {
       bool is_left_full = IsFullBinaryTree(left_node);
       bool is_right_full = IsFullBinaryTree(right_node);
+      // If left sub-tree is full binary tree and right sub-tree is
+      // full binary tree, return true;
+      // Else if left sub-tree and right sub-tree do'nt exist cuerrent tree
+      // is full binary tree, so return true;
+      // Otherwise, return false.
       if (is_left_full && is_right_full) {
+        return true;
+      } else if (!is_left_full && !is_right_full) {
         return true;
       } else {
         return false;
