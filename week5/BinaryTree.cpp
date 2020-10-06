@@ -1,4 +1,5 @@
 // Copyright [2020] <LeeYesung>
+#include <iostream>
 #include <vector>
 
 class Node {
@@ -7,9 +8,12 @@ class Node {
   Node(const Node& node) : value_(node.value_),
   left_(node.left_), right_(node.right_) {}
   ~Node() {
-    delete left_;
-    delete right_;
-    delete this;
+    if (left_ != NULL) {
+      delete left_;
+    }
+    if (right_ != NULL) {
+      delete right_;
+    }
   }
   int value() {
     return value_;
@@ -26,13 +30,13 @@ class Node {
   const Node* right() const {
     return right_;
   }
-  void operator<<=(Node* left) {
+  void operator <<=(Node* left) {
     if (left_ != NULL) {
       delete left_;
     }
     left_ = left;
   }
-  void operator>>=(Node* right) {
+  void operator >>=(Node* right) {
     if (right_ != NULL) {
       delete right_;
     }
@@ -49,6 +53,9 @@ class Node {
 class TreeUtil {
  public:
   static TreeUtil* GetTreeUtil() {
+    if (s_tree_util_ == NULL) {
+      s_tree_util_ = new TreeUtil();
+    }
     return s_tree_util_;
   }
   int CalHeight(const Node* node) {
@@ -59,17 +66,18 @@ class TreeUtil {
     // If left sub tree height is more bigger return it.
     // If right sub tree height is more bigger return it.
     // If right and left node don't exixt, retun 0.
-    if ((left_node != NULL) || (right_node != NULL)) {
+    if (left_node != NULL) {
       left_count = CalHeight(left_node) + 1;
-      right_count = CalHeight(right_node) + 1;
-      if (left_count >= right_count) {
-        return left_count;
-      } else {
-        return right_count;
-      }
-    } else {
-      return 0;
     }
+    if (right_node != NULL) {
+      right_count = CalHeight(right_node) + 1;
+    }
+    if (left_count >= right_count) {
+      return left_count;
+    } else {
+      return right_count;
+    }
+    return 0;
   }
   int CalTotalNumOfNodes(const Node* node) {
     int count = 0;
@@ -78,10 +86,10 @@ class TreeUtil {
     // Count all subtree's node.
     // If right or left node don't exist, return 1.
     if (left_node != NULL) {
-      count = CalTotalNumOfNodes(left_node);
+      count += CalTotalNumOfNodes(left_node);
     }
     if (right_node != NULL)  {
-      count = CalTotalNumOfNodes(right_node);
+      count += CalTotalNumOfNodes(right_node);
     }
     return count + 1;
   }
@@ -131,5 +139,6 @@ class TreeUtil {
   }
 
  private:
+  TreeUtil() {}
   static TreeUtil* s_tree_util_;
 };
