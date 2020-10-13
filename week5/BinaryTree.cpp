@@ -142,3 +142,5 @@ class TreeUtil {
   TreeUtil() {}
   static TreeUtil* s_tree_util_;
 };
+
+TreeUtil* TreeUtil::s_tree_util_ = nullptr;
